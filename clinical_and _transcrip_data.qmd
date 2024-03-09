@@ -3,15 +3,40 @@ title: "clinical_and _transcrip_data"
 format: html
 editor: visual
 ---
+### References
+Main reference for obtain data and the TNBC classification: 
+https://doi.org/10.1038/s41467-021-26502-6
+"Multi-omics analysis identifies therapeutic vulnerabilities in triple-negative 
+breast cancer subtypes"
+https://github.com/TransBioInfoLab/TNBC_analysis/tree/master
 
-## Quarto
-
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
-
-## Running Code
-
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+## Load required packgaes
 
 ```{r}
-1 + 1
+library(dplyr)
+library(TCGAbiolinks)
 ```
+
+
+## Download clinical and transcriptomic data
+
+```{r}
+BRCA.htseq_counts = read.table(file = "TCGA-BRCA.htseq_counts.tsv",
+                               sep = "\t",
+                               header = T,
+                               row.names = 1)
+
+BRCA.htseq_counts_round = round(((2 ^ BRCA.htseq_counts) - 1), 0)
+
+query.clin <- GDCquery(project = "TCGA-BRCA",
+                       data.category = "Clinical",
+                       data.format = "BCR XML")
+
+GDCdownload(query.clin)
+
+GDCdownload(query.rna, files.per.chunk = 1 ,directory = my.dir)
+
+BRCA.clin <- GDCprepare_clinic(query = query.clin, 
+                               clinical.info = "patient")
+```
+
